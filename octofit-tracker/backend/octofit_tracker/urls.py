@@ -31,12 +31,16 @@ router.register(r'leaderboard', views.LeaderboardViewSet)
 
 @api_view(['GET'])
 def api_root(request, format=None):
+    # Dynamically build the base URL using the request host (supports codespace and localhost)
+    host = request.get_host()
+    scheme = 'https' if request.is_secure() or host.endswith('.app.github.dev') else 'http'
+    base_url = f"{scheme}://{host}"
     return Response({
-        'users': reverse('user-list', request=request, format=format),
-        'teams': reverse('team-list', request=request, format=format),
-        'activities': reverse('activity-list', request=request, format=format),
-        'workouts': reverse('workout-list', request=request, format=format),
-        'leaderboard': reverse('leaderboard-list', request=request, format=format),
+        'users': base_url + reverse('user-list', request=request, format=format),
+        'teams': base_url + reverse('team-list', request=request, format=format),
+        'activities': base_url + reverse('activity-list', request=request, format=format),
+        'workouts': base_url + reverse('workout-list', request=request, format=format),
+        'leaderboard': base_url + reverse('leaderboard-list', request=request, format=format),
     })
 
 urlpatterns = [
